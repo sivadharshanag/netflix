@@ -1,0 +1,88 @@
+{
+  "_comment": "Copy this file to editorial.json (same folder) and edit it. editorial.json is gitignored because it contains personal names, dates, and messages — editorial.example.json stays in the repo as a template only.",
+
+  "heroMediaId": null,
+  "_heroMediaId_comment": "Set to a real media id to pick the homepage hero. Find ids by opening /api/media/manifest while logged in, or leave null for a designed fallback hero.",
+
+  "featuredCollectionFolder": "Moments to cherish",
+  "featuredCollectionTitle": "Our Favourite Memories",
+  "featuredCollectionDescription": "Four years, countless photographs, endless laughter, and moments worth reliving forever. A personal collection of memories, created just for Varunika.",
+  "featuredEpisodeOrder": [],
+  "_featuredEpisodeOrder_comment": "List of media ids (from the 'Moments to cherish' folder) in the order you want them to play as episodes. Leave empty to order by file date.",
+
+  "seasons": [
+    {
+      "season": 1,
+      "title": "The Beginning",
+      "description": "Where it all started.",
+      "folders": ["Random college snap", "Pongal"]
+    },
+    {
+      "season": 2,
+      "title": "The Chaos Era",
+      "description": "Hackathons, dance practice, and everything in between.",
+      "folders": ["Hackathon", "Dance", "inplant cbe"]
+    },
+    {
+      "season": 3,
+      "title": "Core Memories",
+      "description": "Trips, family, and the moments that stuck.",
+      "folders": ["IV Kerala", "IV kodaikkanal", "Akka Marraige"]
+    },
+    {
+      "season": 4,
+      "title": "The Final Chapter",
+      "description": "The last year, and the birthdays that mattered.",
+      "folders": ["Birthday - 2024", "Birthday - 2025"]
+    }
+  ],
+  "_seasons_comment": "These folder assignments are editable suggestions, not facts about what actually happened each year. Reassign folders freely, or remove a season's folders list down to [] if it doesn't apply yet.",
+
+  "profile": {
+    "name": "Varunika",
+    "tagline": "Birthday Girl",
+    "photoMediaId": null
+  },
+  "_profile_comment": "Set photoMediaId to a real photo's media id to use it on the profile-selection screen. Leave null for a designed monogram avatar.",
+
+  "birthdayLetter": {
+    "heading": "Birthday Letter",
+    "body": "Dear Varunika,\n\nFour years gave us so many memories, laughs, and moments worth keeping. This little corner of the internet is a collection of those memories and a reminder of how special they are.\n\nHappy Birthday! Here's to all the stories still waiting to be written.",
+    "from": "[Your Name]",
+    "messageParagraphs": [],
+    "closingLines": []
+  },
+  "_birthdayLetter_comment": "Replace body and from with your own words before sending this to Varunika. Or, for a rolling-credits-style letter instead of one static block, fill in messageParagraphs (shown one at a time) and closingLines (short final lines shown after it) — leave both as [] to keep the simple static body instead.",
+
+  "easterEgg": {
+    "clickThreshold": 5,
+    "message": "You found the secret. Happy Birthday, Varunika — here's to every story still waiting to be written.",
+    "favoriteMediaId": null
+  },
+
+  "hiddenCollection": {
+    "title": "Only We Understand",
+    "label": "Classified",
+    "keySequence": ["o", "w", "u"],
+    "mediaIds": []
+  },
+  "_hiddenCollection_comment": "Type the keySequence anywhere on the homepage to unlock this row. Add media ids you've deliberately chosen for it — the 'Funny calls' folder is a natural source, but nothing is added automatically.",
+
+  "timeline": [],
+  "_timeline_comment": "Add milestones manually, e.g. { \"id\": \"farewell-2025\", \"title\": \"Farewell\", \"description\": \"...\", \"date\": \"2025-05-01\", \"mediaId\": \"<id>\" }. Dates are only ever shown when you supply them here — none are invented.",
+
+  "endCredits": {
+    "heading": "THE END?",
+    "subheading": "Every great story deserves a sequel.",
+    "entries": [],
+    "messageParagraphs": [],
+    "closingLines": [],
+    "from": ""
+  },
+  "_endCredits_comment": "Add entries like { \"mediaId\": \"<id>\", \"caption\": \"...\" } to roll photos in the credits sequence. Or write a personal closing letter instead: messageParagraphs is an array of paragraphs shown one at a time like rolling movie credits, closingLines are short final lines shown after it (e.g. a sentiment, then a thank-you), and from is your signature. Write your own words — nothing here should be invented for you.",
+
+  "soundtrack": {
+    "backgroundMusicUrl": null
+  },
+  "_soundtrack_comment": "Set backgroundMusicUrl to a path under /public (e.g. '/audio/theme.mp3') once you've added a licensed or original track there."
+}

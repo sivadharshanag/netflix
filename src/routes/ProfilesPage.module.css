@@ -1,0 +1,66 @@
+.wrap {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 48px;
+  background: var(--bg-deep);
+}
+
+.heading {
+  font-size: clamp(1.6rem, 4vw, 2.4rem);
+  font-weight: 500;
+}
+
+.profile {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 14px;
+  background: transparent;
+  border: none;
+  color: var(--text);
+}
+
+.avatarRing {
+  width: 160px;
+  height: 160px;
+  border-radius: 50%;
+  overflow: hidden;
+  border: 3px solid transparent;
+  transition: border-color var(--duration-base) var(--ease-cinematic), box-shadow var(--duration-base) var(--ease-cinematic), transform var(--duration-base) var(--ease-cinematic);
+}
+.profile:hover .avatarRing,
+.profile:focus-visible .avatarRing {
+  border-color: var(--accent);
+  box-shadow: 0 0 36px rgba(229, 9, 20, 0.55);
+  transform: scale(1.04);
+}
+
+.avatarImage {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center 20%;
+}
+
+.monogram {
+  width: 100%;
+  height: 100%;
+  display: grid;
+  place-items: center;
+  background: linear-gradient(145deg, var(--surface-elevated), var(--surface));
+  font-size: 4rem;
+  font-weight: 800;
+  color: var(--accent);
+}
+
+.name {
+  font-size: 1.1rem;
+}
+
+.tagline {
+  color: var(--text-secondary);
+  font-size: 0.9rem;
+}

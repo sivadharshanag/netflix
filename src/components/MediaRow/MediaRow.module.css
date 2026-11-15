@@ -1,0 +1,57 @@
+.row {
+  position: relative;
+  margin-bottom: 40px;
+}
+
+.heading {
+  font-size: 1.1rem;
+  font-weight: 600;
+  margin: 0 0 12px;
+  padding-left: var(--gutter);
+}
+
+.scrollerWrap {
+  position: relative;
+}
+
+.scroller {
+  display: flex;
+  gap: 8px;
+  overflow-x: auto;
+  scroll-behavior: smooth;
+  padding: 4px var(--gutter) 16px;
+  scroll-snap-type: x proximity;
+}
+
+.navButton {
+  position: absolute;
+  top: 0;
+  bottom: 16px;
+  width: 44px;
+  display: grid;
+  place-items: center;
+  background: linear-gradient(90deg, var(--bg) 20%, transparent);
+  border: none;
+  color: var(--text);
+  opacity: 0;
+  transition: opacity var(--duration-fast) var(--ease-cinematic);
+  z-index: 3;
+}
+.scrollerWrap:hover .navButton,
+.scrollerWrap:focus-within .navButton {
+  opacity: 1;
+}
+.navButton.right {
+  right: 0;
+  left: auto;
+  background: linear-gradient(270deg, var(--bg) 20%, transparent);
+}
+.navButton:focus-visible {
+  opacity: 1;
+}
+
+.empty {
+  padding-left: var(--gutter);
+  color: var(--text-muted);
+  font-size: 0.9rem;
+}

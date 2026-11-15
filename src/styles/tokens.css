@@ -1,0 +1,45 @@
+:root {
+  --bg: #141414;
+  --bg-deep: #080808;
+  --accent: #e50914;
+  --accent-dim: #a80712;
+  --surface: #232323;
+  --surface-elevated: #303030;
+  --text: #ffffff;
+  --text-secondary: #b3b3b3;
+  --text-muted: #808080;
+
+  --focus-ring: 0 0 0 3px rgba(229, 9, 20, 0.55), 0 0 0 5px rgba(255, 255, 255, 0.9);
+
+  --radius-sm: 4px;
+  --radius-md: 6px;
+
+  --ease-cinematic: cubic-bezier(0.22, 0.61, 0.36, 1);
+  --duration-fast: 150ms;
+  --duration-base: 320ms;
+  --duration-slow: 600ms;
+
+  --font-sans: "Helvetica Neue", Helvetica, Arial, system-ui, sans-serif;
+
+  --gutter: 16px;
+}
+
+@media (min-width: 768px) {
+  :root {
+    --gutter: 32px;
+  }
+}
+
+@media (min-width: 1280px) {
+  :root {
+    --gutter: 56px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  :root {
+    --duration-fast: 1ms;
+    --duration-base: 1ms;
+    --duration-slow: 1ms;
+  }
+}

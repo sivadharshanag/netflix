@@ -1,0 +1,208 @@
+.wrap {
+  position: relative;
+  width: 100%;
+  height: 100vh;
+  background: #000;
+  overflow: hidden;
+}
+
+.video {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  background: #000;
+}
+
+.controls {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  background: linear-gradient(0deg, rgba(0, 0, 0, 0.75) 0%, transparent 25%, transparent 75%, rgba(0, 0, 0, 0.55) 100%);
+  opacity: 1;
+  transition: opacity var(--duration-base) var(--ease-cinematic);
+}
+.controls.hidden {
+  opacity: 0;
+  cursor: none;
+}
+
+.topBar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 16px var(--gutter);
+}
+
+.backLink {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  color: var(--text);
+  text-decoration: none;
+  background: rgba(0, 0, 0, 0.4);
+  padding: 8px 14px;
+  border-radius: 999px;
+}
+
+.titleTag {
+  color: var(--text-secondary);
+  font-size: 0.9rem;
+}
+
+.centerButton {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background: rgba(0, 0, 0, 0.5);
+  border: none;
+  color: var(--text);
+  border-radius: 50%;
+  width: 72px;
+  height: 72px;
+  display: grid;
+  place-items: center;
+}
+
+.bottomBar {
+  padding: 10px var(--gutter) 22px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.seekRow {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.seekBar {
+  flex: 1;
+  accent-color: var(--accent);
+  height: 4px;
+}
+
+.time {
+  font-size: 0.8rem;
+  color: var(--text-secondary);
+  min-width: 42px;
+}
+
+.controlsRow {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+
+.iconButton {
+  background: transparent;
+  border: none;
+  color: var(--text);
+  display: grid;
+  place-items: center;
+}
+.iconButton:hover {
+  color: var(--accent);
+}
+
+.volumeRange {
+  width: 80px;
+  accent-color: var(--accent);
+}
+
+.speedSelect {
+  background: rgba(0, 0, 0, 0.5);
+  color: var(--text);
+  border: 1px solid var(--text-muted);
+  border-radius: var(--radius-sm);
+  padding: 4px 6px;
+  font-size: 0.8rem;
+}
+
+.spacer {
+  flex: 1;
+}
+
+.errorOverlay {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  background: rgba(0, 0, 0, 0.85);
+  text-align: center;
+  padding: var(--gutter);
+}
+
+.errorActions {
+  display: flex;
+  gap: 12px;
+  justify-content: center;
+  margin-top: 16px;
+}
+
+.errorBackLink {
+  display: inline-flex;
+  align-items: center;
+  color: var(--text);
+  border: 1px solid var(--text-muted);
+  border-radius: var(--radius-sm);
+  padding: 10px 24px;
+  text-decoration: none;
+}
+.errorBackLink:hover {
+  border-color: var(--text);
+}
+
+.retryButton {
+  background: var(--accent);
+  color: var(--text);
+  padding: 10px 24px;
+  border-radius: var(--radius-sm);
+  border: none;
+}
+
+.nextPrompt {
+  position: absolute;
+  bottom: 100px;
+  right: var(--gutter);
+  background: var(--surface);
+  border-radius: var(--radius-md);
+  padding: 16px;
+  width: 260px;
+  box-shadow: 0 12px 30px rgba(0, 0, 0, 0.6);
+}
+
+.nextPromptThumb {
+  width: 100%;
+  aspect-ratio: 16/9;
+  object-fit: cover;
+  border-radius: var(--radius-sm);
+  margin-bottom: 10px;
+}
+
+.nextPromptActions {
+  display: flex;
+  gap: 8px;
+  margin-top: 10px;
+}
+
+.nextPromptButton {
+  flex: 1;
+  background: var(--text);
+  color: var(--bg);
+  border: none;
+  border-radius: var(--radius-sm);
+  padding: 8px;
+  font-weight: 600;
+}
+
+.nextPromptDismiss {
+  background: transparent;
+  border: 1px solid var(--text-muted);
+  color: var(--text);
+  border-radius: var(--radius-sm);
+  padding: 8px 12px;
+}

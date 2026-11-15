@@ -1,0 +1,15 @@
+{
+  "_comment": "Optional per-file overrides, keyed by the file's path relative to MEDIA_ROOT (forward slashes). Copy to media-overrides.json (gitignored) and edit. Any field you omit keeps its auto-generated value.",
+  "_example": {
+    "Moments to cherish/birthday edit 2025.mp4": {
+      "title": "The Birthday Edit",
+      "description": "Our favorite moments from this year, cut together.",
+      "episodeNumber": 1,
+      "featured": true
+    },
+    "Funny calls/varu/TSA CASE STUDY 1 (183.133,156).mp4": {
+      "title": "TSA Case Study I",
+      "isInsideJoke": true
+    }
+  }
+}

@@ -1,0 +1,146 @@
+.wrap {
+  min-height: 100vh;
+  padding: 24px var(--gutter) 60px;
+}
+
+.header {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 14px;
+  margin-bottom: 24px;
+}
+
+.backLink {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  color: var(--text);
+  text-decoration: none;
+}
+
+.heading {
+  font-size: 1.6rem;
+  margin: 0;
+  flex: 1;
+}
+
+.select,
+.searchInput {
+  background: var(--surface);
+  border: 1px solid var(--surface-elevated);
+  color: var(--text);
+  padding: 8px 12px;
+  border-radius: var(--radius-sm);
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+  gap: 10px;
+}
+
+.tile {
+  position: relative;
+  aspect-ratio: 1;
+  border-radius: var(--radius-sm);
+  overflow: hidden;
+  background: var(--surface);
+  border: none;
+  cursor: pointer;
+  padding: 0;
+}
+
+.tileImage {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  opacity: 0;
+  transition: opacity var(--duration-base) var(--ease-cinematic);
+}
+.tileImage.loaded {
+  opacity: 1;
+}
+
+.videoBadge {
+  position: absolute;
+  bottom: 6px;
+  right: 6px;
+  background: rgba(0, 0, 0, 0.6);
+  color: var(--text);
+  border-radius: 50%;
+  width: 26px;
+  height: 26px;
+  display: grid;
+  place-items: center;
+}
+
+.empty {
+  color: var(--text-muted);
+  text-align: center;
+  margin-top: 60px;
+}
+
+.lightbox {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.95);
+  z-index: 95;
+  display: grid;
+  place-items: center;
+}
+
+.lightboxImage {
+  max-width: 92vw;
+  max-height: 82vh;
+  object-fit: contain;
+}
+
+.lightboxCaption {
+  position: absolute;
+  bottom: 24px;
+  left: 50%;
+  transform: translateX(-50%);
+  color: var(--text-secondary);
+  text-align: center;
+}
+
+.lightboxClose {
+  position: absolute;
+  top: 20px;
+  right: 20px;
+  background: transparent;
+  border: none;
+  color: var(--text);
+}
+
+.lightboxNav {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  background: rgba(0, 0, 0, 0.5);
+  border: none;
+  color: var(--text);
+  border-radius: 50%;
+  width: 44px;
+  height: 44px;
+  display: grid;
+  place-items: center;
+}
+.lightboxNav.prev {
+  left: 16px;
+}
+.lightboxNav.next {
+  right: 16px;
+}
+
+.slideshowToggle {
+  position: absolute;
+  bottom: 24px;
+  right: 24px;
+  background: var(--surface);
+  color: var(--text);
+  border: none;
+  border-radius: var(--radius-sm);
+  padding: 8px 14px;
+}
