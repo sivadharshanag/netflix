@@ -22,3 +22,10 @@ test-results/
 Thumbs.db
 .vscode/*
 !.vscode/extensions.json
+
+# Local secrets (cloud storage keys go in .env.local)
+.env.local
+
+# Stray local copies / screenshots
+New folder/
+*credits-after-skip.png

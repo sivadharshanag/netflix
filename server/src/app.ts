@@ -11,14 +11,18 @@ import { createAuthRouter } from "./routes/auth.js";
 import { createContentRouter } from "./routes/content.js";
 import { createMediaRouter } from "./routes/media.js";
 import { requireAuth } from "./middleware/requireAuth.js";
-import { buildMediaManifest, getIntroVideoPath, getManifestMeta } from "./services/mediaManifest.js";
-import { streamMediaFile } from "./storage/mediaStream.js";
+import { buildMediaManifest, getIntroVideo, getManifestMeta } from "./services/mediaManifest.js";
+import { sendMedia, setRemoteStorage } from "./storage/mediaSource.js";
+import { RemoteStorage } from "./storage/remoteStorage.js";
 
 export async function buildApp(config: AppConfig): Promise<Express> {
-  const manifestState = await buildMediaManifest(config.mediaRoot);
+  const remote = config.remoteStorage ? new RemoteStorage(config.remoteStorage) : undefined;
+  setRemoteStorage(remote);
+  const manifestState = await buildMediaManifest(config.mediaRoot, remote);
   const meta = getManifestMeta();
   if (config.env !== "test") {
-    console.log(`[media] Scanned "${config.mediaRoot}": ${manifestState.items.length} items across ${meta.folders.length} folders.`);
+    const sourceLabel = remote ? `bucket "${remote.config.bucket}" (${remote.origin})` : `"${config.mediaRoot}"`;
+    console.log(`[media] Scanned ${sourceLabel}: ${manifestState.items.length} items across ${meta.folders.length} folders.`);
     if (meta.warnings.length > 0) {
       console.warn(`[media] ${meta.warnings.length} warning(s) during scan:`);
       for (const warning of meta.warnings.slice(0, 20)) {
@@ -29,6 +33,15 @@ export async function buildApp(config: AppConfig): Promise<Express> {
 
   const app = express();
   app.disable("x-powered-by");
+  // Render (and most hosts) terminate HTTPS at a proxy. Without this, Express
+  // thinks requests are plain HTTP and express-session refuses to set the
+  // Secure session cookie — logging in would silently never stick.
+  if (config.env === "production" || config.cookieSecure) {
+    app.set("trust proxy", 1);
+  }
+
+  // Presigned media URLs point at the storage provider's host.
+  const mediaOrigins = remote ? ["'self'", remote.origin] : ["'self'"];
 
   app.use(
     helmet({
@@ -38,8 +51,8 @@ export async function buildApp(config: AppConfig): Promise<Express> {
           : {
               directives: {
                 defaultSrc: ["'self'"],
-                imgSrc: ["'self'", "data:"],
-                mediaSrc: ["'self'"],
+                imgSrc: [...mediaOrigins, "data:"],
+                mediaSrc: mediaOrigins,
                 scriptSrc: ["'self'"],
                 styleSrc: ["'self'", "'unsafe-inline'"],
                 connectSrc: ["'self'"],
@@ -81,12 +94,12 @@ export async function buildApp(config: AppConfig): Promise<Express> {
   // Varunika's private photos/videos — only an optional branding clip the
   // developer drops at the root of MEDIA_ROOT.
   app.get("/api/intro-video", async (req, res) => {
-    const introPath = getIntroVideoPath();
-    if (!introPath) {
+    const intro = getIntroVideo();
+    if (!intro) {
       res.status(404).json({ success: false, message: "No intro video configured." });
       return;
     }
-    await streamMediaFile(req, res, introPath, path.extname(introPath).slice(1));
+    await sendMedia(req, res, intro, path.extname(intro.kind === "local" ? intro.path : intro.key).slice(1));
   });
 
   app.use("/api/auth", createAuthRouter(config));

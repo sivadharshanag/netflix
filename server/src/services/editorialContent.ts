@@ -1,6 +1,7 @@
 import { readFile } from "node:fs/promises";
 import path from "node:path";
 import type { EditorialContent } from "../../../shared/types.js";
+import { REMOTE_KEYS, type RemoteStorage } from "../storage/remoteStorage.js";
 
 const CONTENT_DIR = path.resolve("content");
 
@@ -47,9 +48,21 @@ async function readJsonIfExists(filePath: string): Promise<Record<string, unknow
   }
 }
 
-export async function loadEditorialContent(): Promise<EditorialContent> {
+/**
+ * Reads content/<fileName> from disk; if it isn't there and remote storage is
+ * configured, falls back to content/<fileName> in the bucket. This lets the
+ * private editorial.json live in the bucket instead of the Git repo.
+ */
+async function readContentJson(fileName: string, remote?: RemoteStorage): Promise<Record<string, unknown> | undefined> {
+  const local = await readJsonIfExists(path.join(CONTENT_DIR, fileName));
+  if (local || !remote) return local;
+  const raw = await remote.getText(REMOTE_KEYS.content(fileName));
+  return raw ? JSON.parse(raw) : undefined;
+}
+
+export async function loadEditorialContent(remote?: RemoteStorage): Promise<EditorialContent> {
   const example = await readJsonIfExists(path.join(CONTENT_DIR, "editorial.example.json"));
-  const real = await readJsonIfExists(path.join(CONTENT_DIR, "editorial.json"));
+  const real = await readContentJson("editorial.json", remote);
   let content = deepMerge(HARD_DEFAULTS, example as Partial<EditorialContent> | undefined);
   content = deepMerge(content, real as Partial<EditorialContent> | undefined);
   return content;
@@ -65,8 +78,8 @@ export type MediaOverride = Partial<{
   isInsideJoke: boolean;
 }>;
 
-export async function loadMediaOverrides(): Promise<Record<string, MediaOverride>> {
-  const real = await readJsonIfExists(path.join(CONTENT_DIR, "media-overrides.json"));
+export async function loadMediaOverrides(remote?: RemoteStorage): Promise<Record<string, MediaOverride>> {
+  const real = await readContentJson("media-overrides.json", remote);
   if (!real) return {};
   const overrides: Record<string, MediaOverride> = {};
   for (const [key, value] of Object.entries(real)) {

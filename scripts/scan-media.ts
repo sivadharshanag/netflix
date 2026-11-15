@@ -1,6 +1,6 @@
 import { mkdir, writeFile } from "node:fs/promises";
 import path from "node:path";
-import "dotenv/config";
+import "../server/src/loadEnv.js";
 import { scanMediaDirectory } from "../server/src/services/mediaScanner.js";
 
 async function run(): Promise<void> {

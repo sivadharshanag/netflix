@@ -28,7 +28,9 @@ function mediaTypeFor(extension: string): MediaType | null {
 }
 
 export function stableId(relativePath: string): string {
-  const normalized = relativePath.split(path.sep).join("/");
+  // Normalize both separators so an id is identical whether the path came
+  // from a Windows disk scan or a "/"-separated storage bucket key.
+  const normalized = relativePath.split("\\").join("/");
   return createHash("sha1").update(normalized).digest("hex").slice(0, 16);
 }
 
@@ -63,21 +65,95 @@ function tagsForFolder(folder: string): string[] {
     .filter(Boolean);
 }
 
+/** A file found in a media source, before classification. */
+export interface MediaFileEntry {
+  /** Path relative to the media root, using either separator. */
+  relativePath: string;
+  size: number;
+  mtime: Date;
+}
+
 /**
- * Recursively scans `mediaRoot` for supported images/videos and builds a manifest.
- * Entries (files or directories) whose basename starts with "." are treated as
- * hidden/trashed and skipped entirely — this is how OS-level "deleted" media
- * markers (e.g. ".trashed-...") show up on disk.
+ * Turns a flat list of files (from the local disk or from a storage bucket
+ * listing) into a manifest. Any path segment starting with "." is treated as
+ * hidden/trashed and skipped — this is how OS-level "deleted" media markers
+ * (e.g. ".trashed-...") show up on disk.
  */
-export async function scanMediaDirectory(mediaRoot: string): Promise<MediaScanResult> {
-  const absoluteRoot = path.resolve(mediaRoot);
+export function buildScanResult(files: MediaFileEntry[], initialWarnings: MediaWarning[] = []): MediaScanResult {
   const items: MediaItem[] = [];
-  const warnings: MediaWarning[] = [];
+  const warnings: MediaWarning[] = [...initialWarnings];
   const folderSet = new Set<string>();
   const pathById: Record<string, string> = {};
   const rootFiles: string[] = [];
 
-  async function walk(dir: string, topFolder: string | null): Promise<void> {
+  for (const file of files) {
+    const segments = file.relativePath.split(/[\\/]/).filter(Boolean);
+    if (segments.length === 0 || segments.some((segment) => segment.startsWith("."))) continue;
+    const relativePath = file.relativePath;
+    const fileName = segments[segments.length - 1];
+
+    if (segments.length === 1) {
+      // A file sitting loose directly under MEDIA_ROOT, not inside any
+      // named folder — not a browsable collection item (no folder to
+      // categorize it under). Kept aside for special-purpose use (e.g.
+      // a pre-login intro video), never shown as a regular memory.
+      rootFiles.push(relativePath);
+      continue;
+    }
+    const currentFolder = segments[0];
+
+    const extension = extensionOf(fileName);
+    const type = mediaTypeFor(extension);
+
+    if (!type) {
+      const hint = KNOWN_UNSUPPORTED_HINTS[extension];
+      if (hint) {
+        warnings.push({ path: relativePath, reason: hint });
+      }
+      continue;
+    }
+
+    folderSet.add(currentFolder);
+    const id = stableId(relativePath);
+    pathById[id] = relativePath;
+
+    items.push({
+      id,
+      title: titleFromFilename(fileName),
+      description: "",
+      folder: currentFolder,
+      type,
+      mediaUrl: "", // filled in by the route layer once an id -> path lookup exists
+      thumbnailUrl: "",
+      hasPoster: type === "image", // refined for videos in mediaManifest.ts once thumbnails are checked
+      tags: tagsForFolder(currentFolder),
+      extension,
+      playbackCaution: PLAYBACK_CAUTION_EXTENSIONS.has(extension),
+      sizeBytes: file.size,
+      date: file.mtime.toISOString(),
+    });
+  }
+
+  // Stable, deterministic ordering (by folder, then filename-derived title).
+  items.sort((a, b) => (a.folder + a.title).localeCompare(b.folder + b.title));
+
+  return {
+    items,
+    warnings,
+    folders: Array.from(folderSet).sort(),
+    scannedAt: new Date().toISOString(),
+    pathById,
+    rootFiles,
+  };
+}
+
+/** Recursively scans a local `mediaRoot` folder for supported images/videos and builds a manifest. */
+export async function scanMediaDirectory(mediaRoot: string): Promise<MediaScanResult> {
+  const absoluteRoot = path.resolve(mediaRoot);
+  const files: MediaFileEntry[] = [];
+  const warnings: MediaWarning[] = [];
+
+  async function walk(dir: string): Promise<void> {
     let entries;
     try {
       entries = await readdir(dir, { withFileTypes: true });
@@ -93,75 +169,22 @@ export async function scanMediaDirectory(mediaRoot: string): Promise<MediaScanRe
       const relativePath = path.relative(absoluteRoot, absolutePath);
 
       if (entry.isDirectory()) {
-        await walk(absolutePath, topFolder ?? entry.name);
+        await walk(absolutePath);
         continue;
       }
       if (!entry.isFile()) continue;
 
-      if (topFolder === null) {
-        // A file sitting loose directly under MEDIA_ROOT, not inside any
-        // named folder — not a browsable collection item (no folder to
-        // categorize it under). Kept aside for special-purpose use (e.g.
-        // a pre-login intro video), never shown as a regular memory.
-        rootFiles.push(relativePath);
-        continue;
-      }
-      const currentFolder = topFolder;
-
-      const extension = extensionOf(entry.name);
-      const type = mediaTypeFor(extension);
-
-      if (!type) {
-        const hint = KNOWN_UNSUPPORTED_HINTS[extension];
-        if (hint) {
-          warnings.push({ path: relativePath, reason: hint });
-        }
-        continue;
-      }
-
-      let fileStat;
       try {
-        fileStat = await stat(absolutePath);
+        const fileStat = await stat(absolutePath);
+        files.push({ relativePath, size: fileStat.size, mtime: fileStat.mtime });
       } catch (error) {
         warnings.push({ path: relativePath, reason: `Could not stat file: ${(error as Error).message}` });
-        continue;
       }
-
-      folderSet.add(currentFolder);
-      const id = stableId(relativePath);
-      pathById[id] = relativePath;
-
-      items.push({
-        id,
-        title: titleFromFilename(entry.name),
-        description: "",
-        folder: currentFolder,
-        type,
-        mediaUrl: "", // filled in by the route layer once an id -> path lookup exists
-        thumbnailUrl: "",
-        hasPoster: type === "image", // refined for videos in mediaManifest.ts once thumbnails are checked
-        tags: tagsForFolder(currentFolder),
-        extension,
-        playbackCaution: PLAYBACK_CAUTION_EXTENSIONS.has(extension),
-        sizeBytes: fileStat.size,
-        date: fileStat.mtime.toISOString(),
-      });
     }
   }
 
-  await walk(absoluteRoot, null);
-
-  // Stable, deterministic ordering (by folder, then filename-derived title).
-  items.sort((a, b) => (a.folder + a.title).localeCompare(b.folder + b.title));
-
-  return {
-    items,
-    warnings,
-    folders: Array.from(folderSet).sort(),
-    scannedAt: new Date().toISOString(),
-    pathById,
-    rootFiles,
-  };
+  await walk(absoluteRoot);
+  return buildScanResult(files, warnings);
 }
 
 export function resolveAbsolutePath(mediaRoot: string, relativePath: string): string {

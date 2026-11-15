@@ -19,7 +19,7 @@ export function BirthdayLetter({ content, soundtrackUrl }: BirthdayLetterProps) 
   const [open, setOpen] = useState(false);
   const [confettiTrigger, setConfettiTrigger] = useState(0);
   const reducedMotion = useReducedMotion();
-  const { muted, toggleMute, setTrack, play, pause } = useBackgroundAudio();
+  const { muted, toggleMute, setTrack, play, pause, stop } = useBackgroundAudio();
 
   const sequence = useMemo(
     () => [
@@ -44,7 +44,10 @@ export function BirthdayLetter({ content, soundtrackUrl }: BirthdayLetterProps) 
     if (!open || !isRolling || !soundtrackUrl) return;
     setTrack(soundtrackUrl);
     play();
-    return () => pause();
+    return () => {
+      pause();
+      stop();
+    };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [open, isRolling, soundtrackUrl]);
 

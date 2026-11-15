@@ -7,6 +7,7 @@ interface AudioContextValue {
   setTrack: (url: string | undefined) => void;
   play: () => void;
   pause: () => void;
+  stop: () => void;
   duck: () => void;
   restore: () => void;
 }
@@ -25,6 +26,7 @@ export function BackgroundAudioProvider({ children }: { children: ReactNode }) {
     audioRef.current = audio;
     return () => {
       audio.pause();
+      audio.currentTime = 0;
       audio.src = "";
     };
   }, []);
@@ -38,6 +40,7 @@ export function BackgroundAudioProvider({ children }: { children: ReactNode }) {
     if (!audio) return;
     if (!url) {
       audio.pause();
+      audio.currentTime = 0;
       audio.removeAttribute("src");
       return;
     }
@@ -56,6 +59,14 @@ export function BackgroundAudioProvider({ children }: { children: ReactNode }) {
     audioRef.current?.pause();
   }, []);
 
+  const stop = useCallback(() => {
+    const audio = audioRef.current;
+    if (!audio) return;
+    audio.pause();
+    audio.currentTime = 0;
+    audio.removeAttribute("src");
+  }, []);
+
   const duck = useCallback(() => {
     const audio = audioRef.current;
     if (!audio || duckedRef.current) return;
@@ -72,8 +83,8 @@ export function BackgroundAudioProvider({ children }: { children: ReactNode }) {
   const toggleMute = useCallback(() => setMuted((prev) => !prev), [setMuted]);
 
   const value = useMemo(
-    () => ({ muted, toggleMute, setTrack, play, pause, duck, restore }),
-    [muted, toggleMute, setTrack, play, pause, duck, restore]
+    () => ({ muted, toggleMute, setTrack, play, pause, stop, duck, restore }),
+    [muted, toggleMute, setTrack, play, pause, stop, duck, restore]
   );
 
   return <BackgroundAudioContext.Provider value={value}>{children}</BackgroundAudioContext.Provider>;

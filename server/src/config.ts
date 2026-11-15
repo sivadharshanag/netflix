@@ -1,6 +1,7 @@
-import "dotenv/config";
+import "./loadEnv.js";
 import argon2 from "argon2";
 import { randomBytes } from "node:crypto";
+import { readRemoteStorageConfig, type RemoteStorageConfig } from "./storage/remoteStorage.js";
 
 export type Env = "development" | "production" | "test";
 
@@ -10,6 +11,8 @@ export interface AppConfig {
   sessionSecret: string;
   passwordHash: string;
   mediaRoot: string;
+  /** Set when MEDIA_STORAGE=s3: media is read from an S3-compatible bucket (R2/B2) instead of mediaRoot. */
+  remoteStorage?: RemoteStorageConfig;
   cookieSecure: boolean;
   /** Only set in development when no BIRTHDAY_PASSWORD_HASH was configured. */
   devGeneratedPassword?: string;
@@ -25,6 +28,7 @@ export async function loadConfig(): Promise<AppConfig> {
   const port = Number(readEnv("PORT") ?? "3000");
   const mediaRoot = readEnv("MEDIA_ROOT") ?? "./media";
   const cookieSecure = readEnv("COOKIE_SECURE") === "true";
+  const remoteStorage = readRemoteStorageConfig();
 
   let sessionSecret = readEnv("SESSION_SECRET");
   if (!sessionSecret) {
@@ -48,5 +52,5 @@ export async function loadConfig(): Promise<AppConfig> {
     console.warn("[config] Set BIRTHDAY_PASSWORD_HASH in .env for a real, persistent passcode.\n");
   }
 
-  return { env, port, sessionSecret, passwordHash, mediaRoot, cookieSecure, devGeneratedPassword };
+  return { env, port, sessionSecret, passwordHash, mediaRoot, remoteStorage, cookieSecure, devGeneratedPassword };
 }

@@ -3,7 +3,7 @@ import { mkdir, readdir, stat } from "node:fs/promises";
 import os from "node:os";
 import path from "node:path";
 import { promisify } from "node:util";
-import "dotenv/config";
+import "../server/src/loadEnv.js";
 import sharp from "sharp";
 import { resolveAbsolutePath, scanMediaDirectory } from "../server/src/services/mediaScanner.js";
 
