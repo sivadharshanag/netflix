@@ -8,33 +8,15 @@
    npm install
    ```
 
-2. Create your `.env`:
+2. Put your photo/video folders inside `media/` at the project root.
 
-   ```bash
-   cp .env.example .env
-   ```
-
-3. Generate a passcode hash and paste the printed `BIRTHDAY_PASSWORD_HASH=...` line into `.env`:
-
-   ```bash
-   npm run hash-password -- "yourSecretPasscode"
-   ```
-
-4. Generate a session secret and set it as `SESSION_SECRET` in `.env`:
-
-   ```bash
-   node -e "console.log(require('crypto').randomBytes(48).toString('hex'))"
-   ```
-
-5. Put your photo/video folders inside `media/` at the project root.
-
-6. Create the content file:
+3. Create the content file:
 
    ```bash
    cp content/editorial.example.json content/editorial.json
    ```
 
-7. Start the app:
+4. Start the app:
 
    ```bash
    npm run dev
